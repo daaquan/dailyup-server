@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:80"
+    environment:
+      DB_ADAPTER: Mysql
+      DB_HOST: db
+      DB_USERNAME: user
+      DB_PASSWORD: pass
+      DB_NAME: dailyup
+      JWT_SECRET: secret
+      SERVER_ROOT: public/
+    depends_on:
+      - db
+      - redis
+  db:
+    image: mysql:8.3
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: dailyup
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    volumes:
+      - db-data:/var/lib/mysql
+  redis:
+    image: redis:alpine
+volumes:
+  db-data:
