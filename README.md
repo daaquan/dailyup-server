@@ -1,10 +1,10 @@
 # DailyUp Web
 
-Cute and easy-to-use habit tracker built with a **Laravel (Lumen)** API and a **React** frontend.
+Cute and easy-to-use habit tracker built with a **Phalcon** API and a **React** frontend.
 
 ## Features
 
-- API driven: Laravel exposes CRUD endpoints for habits
+- API driven: Phalcon exposes CRUD endpoints for habits
 - React UI with soft colors and rounded cards
 - Add or remove habits, toggle completion
 - Google Fonts `Fredoka` for playful typography
@@ -12,7 +12,7 @@ Cute and easy-to-use habit tracker built with a **Laravel (Lumen)** API and a **
 
 ## Project Structure
 
-- `backend/` - Lumen based API
+- `public/` - Phalcon based API
 - `frontend/` - React single page app
 
 ## Getting Started
@@ -22,9 +22,8 @@ Cute and easy-to-use habit tracker built with a **Laravel (Lumen)** API and a **
 Requires PHP and Composer. Install dependencies and run migrations:
 
 ```bash
-cd backend
 composer install
-php artisan migrate
+php -r "include 'database/migrations/001_create_topics.php'; (new CreateTopics())->up(new Phalcon\\Db\\Adapter\\Pdo\\Sqlite(['dbname'=>':memory:']));"
 php -S localhost:8000 -t public
 ```
 
@@ -38,4 +37,4 @@ npm install
 npm run dev
 ```
 
-The frontend expects the API to run on `localhost:8000`. Open `frontend/public/index.html` in a browser or use a simple static server with `npm start`.
+The frontend expects the API to run on `localhost:8000`.

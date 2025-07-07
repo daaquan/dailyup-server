@@ -1,0 +1,18 @@
+name: PHP Tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: phalcon
+      - run: composer install --prefer-dist
+      - name: Run migrations
+        run: php -r "(require 'vendor/autoload.php');\n$db=new Phalcon\\Db\\Adapter\\Pdo\\Sqlite(['dbname'=>':memory:']);\ninclude 'database/migrations/001_create_topics.php'; (new CreateTopics())->up($db);"
+      - run: vendor/bin/phpunit --coverage-clover=coverage.xml
