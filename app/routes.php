@@ -8,3 +8,4 @@ $topic->get('/', 'index');
 $app->mount($topic);
 
 $app->post('/login', [App\Controllers\AuthController::class, 'login']);
+$app->post('/refresh', [App\Controllers\AuthController::class, 'refresh']);

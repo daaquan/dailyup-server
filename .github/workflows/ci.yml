@@ -1,0 +1,63 @@
+name: CI
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.3
+        env:
+          MYSQL_ROOT_PASSWORD: rootpass
+          MYSQL_DATABASE: dailyup
+          MYSQL_USER: user
+          MYSQL_PASSWORD: pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot -prootpass"
+          --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: phalcon, redis
+          coverage: xdebug
+
+      - name: Cache composer
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --ignore-platform-req=ext-phalcon
+
+      - name: Run migrations
+        run: |
+          php -r "include 'database/migrations/001_create_topics.php'; (new CreateTopics())->up(new Phalcon\\Db\\Adapter\\Pdo\\Mysql(['host'=>'127.0.0.1','username'=>'user','password'=>'pass','dbname'=>'dailyup']));"
+          php -r "include 'database/migrations/002_seed_topics.php'; (new SeedTopics())->up(new Phalcon\\Db\\Adapter\\Pdo\\Mysql(['host'=>'127.0.0.1','username'=>'user','password'=>'pass','dbname'=>'dailyup']));"
+
+      - name: Run tests
+        run: vendor/bin/phpunit --coverage-text
+
+      - name: Build and push image
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/phalcon-api:latest
+          file: Dockerfile
+          context: .

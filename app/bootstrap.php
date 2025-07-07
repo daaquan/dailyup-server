@@ -14,25 +14,19 @@ $loader->setNamespaces([
     'App\\Models' => __DIR__ . '/models/',
     'App\\Services' => __DIR__ . '/services/',
     'App\\Validation' => __DIR__ . '/validation/',
-    'App\\Tasks' => __DIR__ . '/tasks/'
+    'App\\Tasks' => dirname(__DIR__) . '/cli/tasks/',
+    'App\\Middleware' => __DIR__ . '/middleware/'
 ]);
 $loader->register();
 
-$configArray = [
-    'database' => [
-        'adapter'  => getenv('DB_ADAPTER') ?: 'Mysql',
-        'host'     => getenv('DB_HOST') ?: 'localhost',
-        'username' => getenv('DB_USERNAME') ?: 'root',
-        'password' => getenv('DB_PASSWORD') ?: '',
-        'dbname'   => getenv('DB_NAME') ?: 'dailyup',
-        'charset'  => 'utf8mb4'
-    ],
-    'jwt' => [
-        'secret' => getenv('JWT_SECRET') ?: 'secret'
-    ]
-];
 
-$config = new Config($configArray);
+$appConfig = require __DIR__ . '/../config/app.php';
+$dbConfig  = require __DIR__ . '/../config/db.php';
+$jwtConfig = require __DIR__ . '/../config/jwt.php';
+
+$config = new Config($appConfig);
+$config->offsetSet('database', new Config($dbConfig));
+$config->offsetSet('jwt', new Config($jwtConfig));
 $container->set('config', $config);
 
 $container->setShared('db', function() use ($config) {
@@ -50,10 +44,18 @@ $container->setShared('db', function() use ($config) {
     ]);
 });
 
+$container->setShared('redis', function() {
+    $redis = new Redis();
+    $redis->connect(getenv('REDIS_HOST') ?: 'redis', 6379);
+    return $redis;
+});
+
 $container->setShared(App\Services\JwtService::class, function() use ($config) {
     return new App\Services\JwtService($config->jwt->toArray());
 });
 
 $app = new Micro($container);
+$app->before(new App\Middleware\CorsMiddleware());
+$app->before(new App\Middleware\RateLimitMiddleware());
 
 return $app;
