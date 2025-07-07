@@ -15,7 +15,7 @@ $loader->setNamespaces([
     'App\\Services' => __DIR__ . '/services/',
     'App\\Validation' => __DIR__ . '/validation/',
     'App\\Tasks' => dirname(__DIR__) . '/cli/tasks/',
-    'App\\Middleware' => __DIR__ . '/middleware/'
+    'App\\Middleware' => __DIR__ . '/Middleware/'
 ]);
 $loader->register();
 

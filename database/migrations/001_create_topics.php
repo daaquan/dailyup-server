@@ -5,7 +5,7 @@ class CreateTopics
 {
     public function up(AbstractPdo $db)
     {
-        $dialect = $db->getDialect()->getDialectType();
+        $dialect = $db->getDialectType();
         if ($dialect === 'sqlite') {
             $sql = 'CREATE TABLE IF NOT EXISTS topics (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,

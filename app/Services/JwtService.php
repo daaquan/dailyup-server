@@ -2,7 +2,7 @@
 namespace App\Services;
 
 use Phalcon\Encryption\Security\JWT\Token\Parser;
-use Phalcon\Encryption\Security\JWT\Token\Validator;
+use Phalcon\Encryption\Security\JWT\Validator;
 use Phalcon\Encryption\Security\JWT\Signer\Hmac;
 use Phalcon\Encryption\Security\JWT\Builder;
 use Phalcon\Encryption\Security\JWT\Serializer\Jws;
@@ -22,7 +22,7 @@ class JwtService
         $builder = new Builder($signer);
         $now = time();
         $builder->setIssuedAt($now)
-            ->setExpiration($now + 3600)
+            ->setExpirationTime($now + 3600)
             ->setSubject($sub);
         $token = $builder->getToken();
         $serializer = new Jws();
