@@ -22,3 +22,12 @@ composer install
 php -r "include 'database/migrations/001_create_topics.php'; (new CreateTopics())->up(new Phalcon\\Db\\Adapter\\Pdo\\Sqlite(['dbname'=>':memory:']));"
 php -S localhost:8000 -t public
 ```
+
+### Production
+
+To build and run the containers for production use:
+
+```bash
+make docker-prod
+```
+\nA cron task runs `php app/cli.php crawl topics` every 10 minutes.

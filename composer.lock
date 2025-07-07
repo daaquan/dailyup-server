@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ba5f1c4c186cebd5d72f324e8439c49",
-    "packages": [],
+    "content-hash": "1901fe695acc29fba29a821feff200b7",
+    "packages": [
+        {
+            "name": "oaklabs/phalcon-throttler",
+            "version": "v0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oak-labs-io/phalcon-throttler.git",
+                "reference": "286e77e1e9926f4f3a8abcb72167461dc61a9484"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oak-labs-io/phalcon-throttler/zipball/286e77e1e9926f4f3a8abcb72167461dc61a9484",
+                "reference": "286e77e1e9926f4f3a8abcb72167461dc61a9484",
+                "shasum": ""
+            },
+            "require": {
+                "ext-phalcon": ">=3.1.2",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phalcon/incubator": "dev-master",
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OakLabs\\PhalconThrottler\\": "src/PhalconThrottler"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "OakLabs GmbH",
+                    "email": "development@oak-labs.com"
+                }
+            ],
+            "description": "Rate limiter PHP Phalcon Framework.",
+            "keywords": [
+                "phalcon",
+                "rate limiter",
+                "throttler"
+            ],
+            "support": {
+                "issues": "https://github.com/oak-labs-io/phalcon-throttler/issues",
+                "source": "https://github.com/oak-labs-io/phalcon-throttler/tree/master"
+            },
+            "time": "2018-03-19T10:50:40+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "myclabs/deep-copy",

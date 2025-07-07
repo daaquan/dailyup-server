@@ -44,4 +44,10 @@ class JwtService
         }
         return $validator->getPayload();
     }
+
+    public function refresh(string $token): string
+    {
+        $payload = $this->validate($token);
+        return $this->issue($payload['sub']);
+    }
 }

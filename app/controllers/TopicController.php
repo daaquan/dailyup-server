@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use Phalcon\Mvc\Controller;
+use Phalcon\Paginator\Adapter\QueryBuilder as Paginator;
 use App\Models\Topic;
 use App\Validation\TopicQueryValidator;
 
@@ -23,24 +24,35 @@ class TopicController extends Controller
         $perPage = min(max(1, (int)($params['per_page'] ?? 10)), 100);
         $category = $params['category'] ?? null;
 
-        $builder = Topic::query();
-        if ($category) {
-            $builder->where('category = :cat:', ['cat' => $category]);
+        $cacheKey = "topics:" . ($category ?: 'all') . ":{$page}:{$perPage}";
+        $cached = $this->di->get('redis')->get($cacheKey);
+        if ($cached) {
+            return $this->response->setJsonContent(json_decode($cached, true));
         }
-        $countBuilder = clone $builder;
-        $total = $countBuilder->columns('COUNT(*) as c')->execute()->getFirst()['c'];
-        $offset = ($page - 1) * $perPage;
-        $builder->orderBy('published_at DESC');
-        $builder->limit($perPage, $offset);
-        $topics = $builder->execute()->toArray();
 
-        return $this->response->setJsonContent([
-            'topics' => $topics,
-            'meta' => [
-                'page' => $page,
-                'per_page' => $perPage,
-                'total' => (int)$total
-            ]
+        $builder = $this->modelsManager->createBuilder()
+            ->from(Topic::class);
+        if ($category) {
+            $builder->andWhere('category = :cat:', ['cat' => $category]);
+        }
+        $builder->orderBy('published_at DESC');
+
+        $paginator = new \Phalcon\Paginator\Adapter\QueryBuilder([
+            'builder' => $builder,
+            'limit'   => $perPage,
+            'page'    => $page,
         ]);
+
+        $pageObj = $paginator->paginate();
+        $result = [
+            'topics' => $pageObj->items->toArray(),
+            'meta' => [
+                'page' => $pageObj->current,
+                'per_page' => $perPage,
+                'total' => $pageObj->total_items,
+            ]
+        ];
+        $this->di->get('redis')->setex($cacheKey, 30, json_encode($result));
+        return $this->response->setJsonContent($result);
     }
 }

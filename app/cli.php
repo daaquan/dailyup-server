@@ -8,7 +8,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $di = new CliDI();
 $loader = new Loader();
 $loader->setNamespaces([
-    'App\\Tasks' => __DIR__ . '/tasks/'
+    'App\\Tasks' => dirname(__DIR__) . '/cli/tasks/'
 ]);
 $loader->register();
 
